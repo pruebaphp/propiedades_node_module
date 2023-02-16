@@ -1,0 +1,69 @@
+extends ../layout/admin
+
+block styles 
+    meta(name="csrf-token" content= csrfToken)
+
+block contenido
+
+    div.py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Bienes
+            span.font-normal Raices
+        h2.text-center.text-3xl.font-extrabold= pagina
+
+        a(href="/propiedades/crear" class="rounded-lg py-2 px-10 bg-indigo-600  hover:bg-indigo-700 text-sm font-bold text-center text-white  uppercase my-5 inline-block w-full  sm:w-auto") Publicar Propiedad 
+
+        //- pre= JSON.stringify(propiedades, undefined, 2)
+
+        if propiedades.length 
+            div(class="bg-white shadow-2xl rounded-lg")
+                ul(class="divide-y divide-gray-200")
+                    each propiedad in propiedades 
+                        li 
+                            div(class="p-6 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-8 gap-4 md:space-y-0")
+                                div(class="sm:w-1/4 md:w-1/6") 
+                                    img(src=`uploads/${propiedad.img}`, alt=`Imagen propiedad ${propiedad.titulo}`)
+                                div(class="sm:w-2/4 md:w-3/6 lg:w-4/6 space-y-3") 
+                                    a(href=`propiedad/${propiedad.id}` class="block text-2xl font-extrabold text-indigo-600 truncate")= propiedad.titulo
+
+                                    p(class="text-sm text-black font-bold")= propiedad.categoria.nombre
+                                    p(class="text-sm text-gray-500 font-bold flex items-center")= propiedad.precio.nombre
+                                    a(href=`/mensajes/${propiedad.id}` class="text-sm text-gray-600")= `${propiedad.mensajes.length} Mensajes`
+                                    
+
+                                div(class="sm:w-1/4 md:w-2/6 lg:w-1/6 flex flex-col 2xl:flex-row gap-2") 
+                                   
+                                        button(type="button" class=`cambiar-estado p-2 md:py-1 text-xs leading-5 cursor-pointer font-bold rounded-lg w-full 
+                                        ${propiedad.publicado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}` data-id=`${propiedad.id}`)= `${propiedad.publicado ? 'Publicado' : 'No publicado'}` 
+
+                                        a(href=`/propiedades/editar/${propiedad.id}` class="text-center p-2 md:py-1 text-xs leading-5 cursor-pointer  font-semibold rounded-lg bg-indigo-100 text-indigo-800") Editar 
+
+
+                                form(method="POST" action=`/propiedades/eliminar/${propiedad.id}`)
+                                        input(type="hidden" name="_csrf" value= csrfToken)
+                                        input(type="submit" class=`p-2 md:py-1 text-xs leading-5 cursor-pointer font-semibold rounded-lg bg-red-100 text-red-800 w-full`  value=`Eliminar`) 
+
+                div(class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6")
+
+                    div(class="flex-1 flex justify-between sm:hidden")
+                        a(href=`/mis-propiedades?pagina=${paginaActual-1}` class=`${paginaActual==1 ? 'pointer-events-none bg-gray-300' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Anterior
+
+                        a(href=`/mis-propiedades?pagina=${paginaActual+1}` class=`${paginaActual==paginas ? 'pointer-events-none bg-gray-300' : ''} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50`) Siguiente
+                    
+                    div(class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between")
+                        p(class="text-sm text-gray-700 gap-2") Mostrando 
+                            span(class="font-medium") #{offset+1} a 
+                            span(class="font-medium") #{total<limite + offset ? total : limite + offset} de 
+                            span(class="font-medium") #{total} resultados 
+
+
+                    div(class="hidden sm:block") 
+                        nav(class="relative z-0 inline-flex rounded-md shadow-md")
+                            -var n=1;
+                                while (n<=paginas)
+                                    a(href=`/mis-propiedades?pagina=${n}` class=`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${paginaActual==n ? 'bg-indigo-200 border-indigo-400' : 'hover:bg-indigo-100' }`) #{n++} 
+
+        else 
+            p(class="text-center uppercase mt-10 text-sky-700 text-xl font-extrabold") Aún no hay propiedades publicadas
+
+block scripts 
+    script(src="/js/cambiarEstado.js") 

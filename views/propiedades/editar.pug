@@ -1,0 +1,112 @@
+extends ../layout/admin
+
+block styles
+     link(rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css")
+
+
+block contenido
+
+    
+
+    div.py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Bienes
+            span.font-normal Raices
+        h2.text-center.text-3xl.font-extrabold= pagina
+
+        if errores  
+            div(class="rounded   mx-auto max-w-md my-10")
+                each error in errores 
+                    p(class="text-white text-center bg-red-500  p-2 my-2 uppercase")= error.msg 
+                   
+        
+
+        div(class="bg-white shadow-xl py-8 border px-4 rounded-lg my-10 mx-auto max-w-4xl md:px-10")
+            //- pre= JSON.stringify(datos,undefined,2)
+
+            form(class="space-y-8" method="POST" id="formulario")
+
+                input(type="hidden" name="_csrf" value= csrfToken)
+                
+                div(class="space-y-5")
+                    h3.text-lg.leading-6.font-medium.text-gray-900 Información General
+                    p.text-gray-600 Añade información general sobre la propiedad en venta
+
+                div 
+                        label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="titulo") Titulo de anuncio
+                        input#titulo.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Titulo Propiedad, Ejm. Casa en la Playa" type="text" name="titulo" value= datos.titulo ? datos.titulo : '')
+
+
+                div 
+                        label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="descripcion") Descripción
+                        //- textarea#descripcion(placeholder="Descripción de la propiedad" class="border border-gray-300 w-full  rounded-xl placeholder-gray-400 px-3 py-2 resize-none" name="descripcion" ) 
+                        textarea#descripcion.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gra-400(placeholder="Descripción de la propiedad" name="descripcion" )= datos.descripcion ? datos.descripcion : ''
+                        
+
+
+                div(class="md:flex md:gap-4 space-y-5 md:space-y-0")    
+
+                        div(class="md:w-1/2")
+                                label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="categoria") Categoria
+                                select#categoria.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="categoria")
+                                    option(value="") - Seleccione - 
+                                    each categoria in categorias
+                                        option(value=categoria.id selected= datos.categoriaId ? datos.categoriaId == categoria.id ? true : false : false)= categoria.nombre
+
+
+                        div(class="md:w-1/2") 
+                                label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="categoria") Precio
+                                select#precio.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="precio")
+                                    option(value="") - Seleccione - 
+                                    each precio in precios 
+                                        option(value=precio.id selected=datos.precioId ? datos.precioId == precio.id ? true : false :false)= precio.nombre 
+
+                div(class="md:flex md:gap-4 space-y-5 md:space-y-0")    
+
+                        div(class="md:w-1/3")
+                                label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="habitaciones") Habitaciones
+                                select#habitaciones.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="habitaciones")
+                                    option(value="") - Seleccione - 
+                                    - var n=1;
+                                        while n<=5
+                                            option(value=n selected= datos.habitaciones ? datos.habitaciones == n ? true : false : false ) #{n++}
+
+                        div(class="md:w-1/3") 
+                                label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="estacionamiento") Estacionamiento
+                                select#estacionamiento.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="estacionamiento")
+                                    option(value="") - Seleccione - 
+                                    - var n=1;
+                                        while n<=4
+                                            option(value=n selected= datos.estacionamiento ? datos.estacionamiento == n ? true : false : false) #{n++}
+
+                        div(class="md:w-1/3") 
+                                label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="wc") Baños
+                                select#precio.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="wc")
+                                    option(value="") - Seleccione - 
+                                    - var n=1;
+                                        while n<=4
+                                            option(value=n selected= datos.wc ? datos.wc == n ? true : false : false) #{n++}
+
+                div.border-gray-200.border-t.py-5.space-y-4 
+                    h3.text-lg.leading-6.font-medium.text-gray-900 Ubicación
+                    p.text-gray-600 Ubica la propiedad en el mapa 
+                    div(id="mapa" class="h-96 w-full")
+
+
+                    div 
+                        p(class="calle text-center")= datos.calle ? datos.calle : ''
+
+                        input(type="hidden" name="calle" id="calle" value= datos.calle ? datos.calle : '')
+                        input(type="hidden" name="lat" id="lat" value= datos.lat ? datos.lat : '')
+                        input(type="hidden" name="lng" id="lng" value= datos.lng ? datos.lng : '')
+
+                div(class="flex justify-center") 
+                    input(type="submit" value="Guardar cambios" class="bg-indigo-600 py-3 px-8 text-white font-bold uppercase hover:bg-indigo-800 cursor-pointer rounded-lg w-full")
+
+
+block scripts 
+
+    script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")
+    script(src="https://unpkg.com/esri-leaflet@3.0.8/dist/esri-leaflet.js")
+    script(src="https://unpkg.com/esri-leaflet-geocoder@2.2.13/dist/esri-leaflet-geocoder.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geosearch/2.7.0/bundle.min.js")
+    script(src="/js/mapa.js")

@@ -1,0 +1,34 @@
+extends ../layout/admin
+
+block styles
+     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css")
+     meta(name="csrf-token" content= csrfToken)
+
+block contenido
+
+    div.py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Bienes
+            span.font-normal Raices
+        h2.text-center.text-3xl.font-extrabold= pagina
+
+        if errores  
+            div(class="rounded   mx-auto max-w-md my-10")
+                each error in errores 
+                    p(class="text-white text-center bg-red-500  p-2 my-2 uppercase")= error.msg 
+                   
+
+
+        div(class="bg-white shadow-xl py-8 border px-4 rounded-lg my-10 mx-auto max-w-4xl md:px-10")
+
+
+                form(id="imagen" class="dropzone space-y-8 border-dashed border-2 rounded w-full min:h-96 h-auto flex-col justify-center items-center" method="POST" action=`/propiedades/agregar-imagen/${propiedad.id}`)
+
+                        input(type="hidden" name="_csrf" value= csrfToken)
+                
+
+                button(type="button" id="publicar" class="bg-indigo-600 py-3 px-8 mt-5   text-white font-bold uppercase hover:bg-indigo-800 cursor-pointer rounded-lg w-full") Publicar propiedad
+
+
+block scripts 
+    script(src="/js/agregarImagen.js") 
+
